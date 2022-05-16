@@ -1,12 +1,6 @@
 `timescale 1ns / 1ps
 
-module control32(Alu_resultHigh, MemorIOtoReg, MemRead, IORead, IOWrite, Opcode, Function_opcode, Jr, RegDST, ALUSrc, MemtoReg, RegWrite, MemWrite, Branch, nBranch, Jmp, Jal, I_format, Sftmd, ALUOp);
-    input[21:0]  Alu_resultHigh;
-    output MemorIOtoReg;
-    output MemRead;
-    output IORead;
-    output IOWrite;
-
+module control32(Opcode, Function_opcode, Jr, RegDST, ALUSrc, MemtoReg, RegWrite, MemWrite, Branch, nBranch, Jmp, Jal, I_format, Sftmd, ALUOp);
     input[5:0]   Opcode;            // 来自IFetch模块的指令高6bit, instruction[31..26]
     input[5:0]   Function_opcode;  	// 来自IFetch模块的指令低6bit, 用于区分r-类型中的指令, instructions[5..0]
     output       Jr;         	 // 为1表明当前指令是jr, 为0表示当前指令不是jr
@@ -42,12 +36,7 @@ module control32(Alu_resultHigh, MemorIOtoReg, MemRead, IORead, IOWrite, Opcode,
 
     assign MemtoReg = Lw;
     assign RegWrite = (R_format || Lw || Jal || I_format) && (!Jr);
-    assign MemRead = (Lw && Alu_resultHigh != 22'h3FFFFF) ? 1'b1 : 1'b0;
-    assign MemWrite = (Sw && Alu_resultHigh != 22'h3FFFFF) ? 1'b1 : 1'b0;
-    assign IORead = (Lw && Alu_resultHigh == 22'h3FFFFF) ? 1'b1 : 1'b0;
-    assign IOWrite = (Sw && Alu_resultHigh == 22'h3FFFFF) ? 1'b1 : 1'b0;
-
-    assign MemorIOtoReg = IORead || MemRead;
+    assign MemWrite = Sw;
 
     assign Branch = Beq;
     assign nBranch = Bne;

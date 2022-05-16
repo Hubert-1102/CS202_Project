@@ -49,5 +49,5 @@ module Ifetc32(Instruction,branch_base_addr,Addr_result,Read_data_1,Branch,nBran
             PC <= Next_PC;
         end
     end
-
+    
 endmodule
