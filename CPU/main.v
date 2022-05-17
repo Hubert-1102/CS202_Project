@@ -119,7 +119,7 @@ output[23:0] leds;
 led led(.clock(clock),
         .reset(reset),
         .LEDCtrl(LEDCtrl),
-        .ioWrite(ioWrite),
+        .ioWrite(IOWrite),
         .write_data(writeData),
         .leds(leds));
 
@@ -128,7 +128,7 @@ input[23:0] switches;
 switch switch(.clock(clock),
               .reset(reset),
               .SwitchCtrl(SwitchCtrl),
-              .ioRead(ioRead),
+              .ioRead(IORead),
               .switches(switches),
               .input_data(readDataFromIO));
 

@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
                  Jal,RegWrite,MemtoReg,RegDst,Sign_extend,clock,reset,opcplus4);
     output[31:0] read_data_1;               // 输出的第一操作数
@@ -12,72 +14,68 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
     output[31:0] Sign_extend;               // 扩展后的32位立即数
     input		 clock,reset;                // 时钟和复位
     input[31:0]  opcplus4;                 // 来自取指单元，JAL中用
-    
-    reg [31:0] registers[31:0];
-    
-    reg [31:0] write_data;
 
-    reg [4:0] write_address;
-    wire[15:0] Immediate;
-    wire [4:0]rd;
-    wire [4:0]rt;
-    wire extend;
-    // wire[17:0] t;
-    // assign t={Immediate,2'b0};
-    assign read_data_1=(Instruction[25:21])?registers[Instruction[25:21]]:32'b0;//rs
-    assign read_data_2=(Instruction[20:16])?registers[Instruction[20:16]]:32'b0;//rt
+    reg[4:0] read_register, write_register;
+    reg[31:0] write_data;
 
-    assign extend=(andi==1'b1||ori==1'b1||xori==1'b1||Instruction[31:26]==6'b001001||Instruction[31:26]==6'b001011)
-    ?1'b0:Immediate[15];
-    assign Immediate=Instruction[15:0];
-    assign andi=Instruction[31:26]==6'b001100;
-    assign ori=Instruction[31:26]==6'b001101;
-    assign xori=Instruction[31:26]==6'b001110;
-    assign lui=Instruction[31:26]==6'b001111;
-    assign Sign_extend=(lui==1'b1)?{Immediate,{16'b0}}:
-    ((Instruction[31:26]==6'b000100||Instruction[31:26]==6'b000101)?
-    {{14{Immediate[15]}},Immediate,2'b0}:{{16{extend}},Immediate});
-    
-    assign rd=Instruction[15:11];
-    assign rt=Instruction[20:16];
-    
-  always @(*) begin //where to write data
-    if(RegWrite==1'b1)begin
-        if(Jal==1'b1)begin
-        write_address=5'b11111;
-        end
-        else if(RegDst==1'b1)
-        begin
-            write_address=rd;
-        end
-        else begin
-        write_address=rt;
-        end
-    end 
-  end
-  always @(*) begin //determine what data to write
-      if(MemtoReg==1'b1)begin
-      write_data=mem_data;
+    reg[31:0] data1, data2;
+
+    reg[31:0] register[0:31];
+    wire[5:0] Opcode, Function_opcode;
+
+    wire[15:0] immediate;
+
+    wire[5:0] rs, rt, rd;
+
+    assign Opcode = Instruction[31:26];
+    assign Function_opcode = Instruction[5:0];
+    assign rs = Instruction[25:21];
+    assign rt = Instruction[20:16];
+    assign rd = Instruction[15:11];
+    assign immediate = Instruction[15:0];
+
+    //OUTPUT
+    assign read_data_1 = register[rs];
+    assign read_data_2 = register[rt];
+    assign Sign_extend = (Opcode == 6'b001011 || Opcode == 6'b001100 || Opcode == 6'b001101 || Opcode == 6'b001110) ?  {16'h0000, immediate} : {{16{immediate[15]}}, immediate};
+
+    always @(*) begin
+      if (Jal) begin
+        write_data = opcplus4;
       end
-    else if(Jal==1'b1)begin
-        write_data=opcplus4;
-    end
-    else begin
-        write_data=ALU_result;//other situations, the data is from ALU
-    end
-    end
-      integer k;
-
-  always @(posedge clock) begin
-      if(reset==1'b1)begin
-          for(k=5'b00000;k<=5'b11111;k=k+5'b00001)begin
-              registers[k]=32'b0;
-          end
+      else if (MemtoReg) begin
+        write_data = mem_data;
       end
       else begin
-      if(RegWrite==1'b1)begin
-          registers[write_address]=write_data;
+        write_data = ALU_result;
       end
+    end
+
+      always @(*) begin
+        if (Jal) begin
+          write_register = 5'b11111;
+        end
+        else if (RegDst) begin
+          write_register = rd;
+        end
+        else begin
+          write_register = rt;
+        end
       end
-  end
-    endmodule
+
+      integer n;
+      always @(posedge clock or posedge reset) begin
+          if (reset) begin
+            for (n = 0; n < 32 ;n = n + 1) begin
+              register[n] <= 32'h0000_0000;
+            end
+          end
+          else if (RegWrite == 1) begin
+            register[write_register] <= write_data;
+          end
+          else begin
+            register[write_register] <= register[write_register];
+          end
+      end
+
+endmodule

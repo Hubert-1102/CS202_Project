@@ -8,18 +8,18 @@ output[15:0] input_data;
 
 reg[15:0] switchData;
 
-assign input_data = switchData;
+assign input_data = switchData[15:0];
 
-always @(posedge clock or posedge reset) begin
-    if (reset) begin
-        switchData <= 24'h000000;
+always @(negedge clock or posedge reset) begin
+    if (reset == 1'b1) begin
+        switchData <= 16'h0000;
     end
     else begin
-        if (SwitchCtrl && ioRead) begin
+        if (SwitchCtrl == 1'b1 && ioRead == 1'b1) begin
             switchData <= switches[15:0];
         end
         else begin
-            switchData <= switchData;
+            switchData <= switchData[15:0];
         end
     end
 end
