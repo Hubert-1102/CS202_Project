@@ -10,7 +10,7 @@ reg[15:0] switchData;
 
 assign input_data = switchData;
 
-always @(posedge clock or negedge reset) begin
+always @(posedge clock or posedge reset) begin
     if (reset) begin
         switchData <= 24'h000000;
     end
