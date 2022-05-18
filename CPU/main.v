@@ -125,7 +125,7 @@ led led(.clock(clock),
         .reset(reset),
         .LEDCtrl(LEDCtrl),
         .ioWrite(IOWrite),
-        .write_data(writeData),
+        .write_data(writeData[15:0]),
         .ledAddr(lowTwoBitAddr),
         .leds(leds));
 

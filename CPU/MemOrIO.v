@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module MemOrIO( mRead, mWrite, ioRead, ioWrite,addr_in, addr_out, m_rdata, io_rdata, r_wdata, r_rdata, write_data, LEDCtrl, SwitchCtrl);
+module MemOrIO(mRead, mWrite, ioRead, ioWrite,addr_in, addr_out, m_rdata, io_rdata, r_wdata, r_rdata, write_data, LEDCtrl, SwitchCtrl);
 input mRead; // read memory, fromController
 input mWrite; // write memory, fromController
 input ioRead; // read IO, from Controller
