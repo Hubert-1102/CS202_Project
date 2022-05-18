@@ -20,7 +20,8 @@ module Ifetc32(Instruction,branch_base_addr,Addr_result,Read_data_1,Branch,nBran
     prgrom instmem(.clka(clock), .addra(PC[15:2]), .douta(Instruction));
 
     assign branch_base_addr = PC + 3'b100;
-    assign link_addr = Jal_address;
+    // assign link_addr = Jal_address;
+    assign link_addr = PC + 3'b100;
     
     always @(*) begin
         if ((Branch == 1 && Zero == 1) || (nBranch == 1 && Zero == 0)) begin
@@ -42,7 +43,7 @@ module Ifetc32(Instruction,branch_base_addr,Addr_result,Read_data_1,Branch,nBran
             PC <= {PC[31:28], Instruction[25:0], 2'b00};
         end
         else if (Jal == 1) begin
-            Jal_address <= PC + 3'b100;
+            // Jal_address <= PC + 3'b100;
             PC <= {PC[31:28], Instruction[25:0], 2'b00};
         end
         else begin

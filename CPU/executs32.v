@@ -32,7 +32,9 @@ module executs32(Read_data_1,Read_data_2,Sign_extend,Function_opcode,Exe_opcode,
     assign ALU_Result = ALU_FinalResult;
     assign Addr_Result = Branch_Addr[31:0];
 
-    assign Branch_Addr = PC_plus_4 + (Sign_extend << 2);
+    // assign Branch_Addr = PC_plus_4 + (Sign_extend << 2);
+    // 因为对于 beq,bne 已经在 decode 模块已经做了左移两位的操作
+    assign Branch_Addr = PC_plus_4 + Sign_extend;
 
     assign Ainput = Read_data_1;
     assign Binput = ALUSrc ? Sign_extend : Read_data_2;
@@ -83,7 +85,8 @@ module executs32(Read_data_1,Read_data_2,Sign_extend,Function_opcode,Exe_opcode,
         end
         // lui
         else if (ALU_ctl == 3'b101 && I_format == 1'b1) begin
-            ALU_FinalResult = {Sign_extend[15:0], 16'h0000};
+            // ALU_FinalResult = {Sign_extend[15:0], 16'h0000};
+            ALU_FinalResult = Sign_extend[31:0];
         end
         // shift
         else if (Sftmd) begin

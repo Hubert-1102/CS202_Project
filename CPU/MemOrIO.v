@@ -32,6 +32,7 @@ always @(*) begin
     end
     else begin
         write_data = 32'hZZZZ_ZZZZ;
+        // write_data = 32'haaaa_aaaa;
     end
 end
 

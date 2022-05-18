@@ -58,7 +58,7 @@ control32 control(.Alu_resultHigh(ALU_Result[31:10]),
                   .Opcode(Opcode), 
                   .Function_opcode(Function_opcode), 
                   .Jr(Jr), 
-                  .RegDST(RegDST), 
+                  .RegDST(RegDst), 
                   .ALUSrc(ALUSrc), 
                   .MemtoReg(MemtoReg), 
                   .RegWrite(RegWrite), 
@@ -79,6 +79,7 @@ dmemory32 memory(.clock(clock),
                  .writeData(writeData), 
                  .readData(readDataFromMemory));
 
+wire[5:0] Shamt;
 assign Shamt = Instruction[10:6];
 
 executs32 alu(.Read_data_1(Read_data_1), 
@@ -94,7 +95,7 @@ executs32 alu(.Read_data_1(Read_data_1),
               .Jr(Jr), 
               .Zero(Zero), 
               .ALU_Result(ALU_Result), 
-              .Addr_Result(Addr_Result), 
+              .Addr_Result(Addr_result), 
               .PC_plus_4(opcplus4));
 
 wire[15:0] readDataFromIO;
@@ -116,11 +117,16 @@ MemOrIO memorio(.mRead(MemRead),
 
 output[23:0] leds;
 
+wire[1:0] lowTwoBitAddr;
+
+assign lowTwoBitAddr = memoryAddress[1:0];
+
 led led(.clock(clock),
         .reset(reset),
         .LEDCtrl(LEDCtrl),
         .ioWrite(IOWrite),
         .write_data(writeData),
+        .ledAddr(lowTwoBitAddr),
         .leds(leds));
 
 input[23:0] switches;
@@ -130,6 +136,7 @@ switch switch(.clock(clock),
               .SwitchCtrl(SwitchCtrl),
               .ioRead(IORead),
               .switches(switches),
+              .switchAddr(lowTwoBitAddr),
               .input_data(readDataFromIO));
 
 endmodule
