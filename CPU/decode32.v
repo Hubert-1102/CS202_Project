@@ -53,7 +53,10 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
         else begin
         write_address=rt;
         end
-    end 
+    end
+    else begin
+        write_address = write_address;
+    end
   end
   always @(*) begin //determine what data to write
       if(MemtoReg==1'b1)begin

@@ -79,7 +79,7 @@ dmemory32 memory(.clock(clock),
                  .writeData(writeData), 
                  .readData(readDataFromMemory));
 
-wire[5:0] Shamt;
+wire[4:0] Shamt;
 assign Shamt = Instruction[10:6];
 
 executs32 alu(.Read_data_1(Read_data_1), 
