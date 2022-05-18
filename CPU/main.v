@@ -41,8 +41,8 @@ decode32 decode(.read_data_1(Read_data_1),
                 .reset(reset), 
                 .opcplus4(opcplus4));
 
-wire[6:0] Opcode;
-wire[6:0] Function_opcode;
+wire[5:0] Opcode;
+wire[5:0] Function_opcode;
 
 assign Opcode = Instruction[31:26];
 assign Function_opcode = Instruction[5:0];
