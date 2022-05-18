@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 
-module main(clk, reset, leds, switches);
+module main(clk, reset, leds, switches, submit);
 
-input clk, reset;
+input clk, reset, submit;
 wire clock;
 
 cpuclk clk1(.clk_in1(clk), .clk_out1(clock));
@@ -39,7 +39,8 @@ decode32 decode(.read_data_1(Read_data_1),
                 .Sign_extend(Sign_extend), 
                 .clock(clock), 
                 .reset(reset), 
-                .opcplus4(opcplus4));
+                .opcplus4(opcplus4),
+                .submit(submit));
 
 wire[5:0] Opcode;
 wire[5:0] Function_opcode;
@@ -127,7 +128,8 @@ led led(.clock(clock),
         .ioWrite(IOWrite),
         .write_data(writeData[15:0]),
         .ledAddr(lowTwoBitAddr),
-        .leds(leds));
+        .leds(leds),
+        .submit(submit));
 
 input[23:0] switches;
 

@@ -1,5 +1,5 @@
 module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
-                 Jal,RegWrite,MemtoReg,RegDst,Sign_extend,clock,reset,opcplus4);
+                 Jal,RegWrite,MemtoReg,RegDst,Sign_extend,clock,reset,opcplus4,submit);
     output[31:0] read_data_1;               // 输出的第一操作数
     output[31:0] read_data_2;               // 输出的第二操作数
     input[31:0]  Instruction;               // 取指单元来的指令
@@ -12,6 +12,7 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
     output[31:0] Sign_extend;               // 扩展后的32位立即数
     input		 clock,reset;                // 时钟和复位
     input[31:0]  opcplus4;                 // 来自取指单元，JAL中用
+    input submit;
     
     reg [31:0] registers[0:31];
     
@@ -42,6 +43,10 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
     assign rt=Instruction[20:16];
     
   always @(*) begin //where to write data
+  if (submit == 1'b0) begin
+      write_address = write_address;
+  end
+  else begin
     if(RegWrite==1'b1)begin
         if(Jal==1'b1)begin
         write_address=5'b11111;
@@ -58,7 +63,13 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
         write_address = write_address;
     end
   end
+  end
+
   always @(*) begin //determine what data to write
+  if (submit == 1'b0) begin
+      write_data = 32'h0000_0000;
+  end
+  else begin
       if(MemtoReg==1'b1)begin
       write_data=mem_data;
       end
@@ -69,6 +80,8 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
         write_data=ALU_result;//other situations, the data is from ALU
     end
     end
+  end
+  
       integer k;
 
   always @(posedge clock or posedge reset) begin
