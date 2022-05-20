@@ -1,9 +1,20 @@
 `timescale 1ns / 1ps
 
-module main(clk, reset, leds, switches, submit);
+module main(clk, reset, leds, switches, submit, status);
 
-input clk, reset, submit;
+input clk, reset, submit, status;
 wire clock;
+wire submit_posedge, status_posedge;
+
+erase_shake submit_shake(.clk(clock),
+                        .rst(reset),
+                        .key_in(submit),
+                        .key_out(submit_posedge));
+
+erase_shake status_shake(.clk(clock),
+                        .rst(reset),
+                        .key_in(status),
+                        .key_out(status_posedge));
 
 cpuclk clk1(.clk_in1(clk), .clk_out1(clock));
 
@@ -39,8 +50,7 @@ decode32 decode(.read_data_1(Read_data_1),
                 .Sign_extend(Sign_extend), 
                 .clock(clock), 
                 .reset(reset), 
-                .opcplus4(opcplus4),
-                .submit(submit));
+                .opcplus4(opcplus4));
 
 wire[5:0] Opcode;
 wire[5:0] Function_opcode;
@@ -119,8 +129,10 @@ MemOrIO memorio(.mRead(MemRead),
 output[23:0] leds;
 
 wire[1:0] lowTwoBitAddr;
+wire[2:0] lowThreeBitAddr;
 
 assign lowTwoBitAddr = memoryAddress[1:0];
+assign lowThreeBitAddr = memoryAddress[2:0];
 
 led led(.clock(clock),
         .reset(reset),
@@ -128,17 +140,19 @@ led led(.clock(clock),
         .ioWrite(IOWrite),
         .write_data(writeData[15:0]),
         .ledAddr(lowTwoBitAddr),
-        .leds(leds),
-        .submit(submit));
+        .leds(leds));
 
 input[23:0] switches;
 
+// Read data from IO
 switch switch(.clock(clock),
               .reset(reset),
               .SwitchCtrl(SwitchCtrl),
               .ioRead(IORead),
               .switches(switches),
-              .switchAddr(lowTwoBitAddr),
-              .input_data(readDataFromIO));
+              .switchAddr(lowThreeBitAddr),
+              .input_data(readDataFromIO),
+              .submit_posedge(submit_posedge),
+              .status_posedge(status_posedge));
 
 endmodule

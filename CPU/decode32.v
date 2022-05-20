@@ -1,5 +1,5 @@
 module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
-                 Jal,RegWrite,MemtoReg,RegDst,Sign_extend,clock,reset,opcplus4,submit);
+                 Jal,RegWrite,MemtoReg,RegDst,Sign_extend,clock,reset,opcplus4);
     output[31:0] read_data_1;               // 输出的第一操作数
     output[31:0] read_data_2;               // 输出的第二操作数
     input[31:0]  Instruction;               // 取指单元来的指令
@@ -12,7 +12,6 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
     output[31:0] Sign_extend;               // 扩展后的32位立即数
     input		 clock,reset;                // 时钟和复位
     input[31:0]  opcplus4;                 // 来自取指单元，JAL中用
-    input submit;
     
     reg [31:0] registers[0:31];
     
@@ -25,8 +24,8 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
     wire extend;
     // wire[17:0] t;
     // assign t={Immediate,2'b0};
-    assign read_data_1=(Instruction[25:21])?registers[Instruction[25:21]]:32'b0;//rs
-    assign read_data_2=(Instruction[20:16])?registers[Instruction[20:16]]:32'b0;//rt
+    assign read_data_1=registers[Instruction[25:21]];//rs
+    assign read_data_2=registers[Instruction[20:16]];//rt
 
     assign extend=(andi==1'b1||ori==1'b1||xori==1'b1||Instruction[31:26]==6'b001001||Instruction[31:26]==6'b001011)
     ?1'b0:Immediate[15];
@@ -39,61 +38,52 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
     ((Instruction[31:26]==6'b000100||Instruction[31:26]==6'b000101)?
     {{14{Immediate[15]}},Immediate,2'b0}:{{16{extend}},Immediate});
     
-    assign rd=Instruction[15:11];
-    assign rt=Instruction[20:16];
+    assign rd = Instruction[15:11];
+    assign rt = Instruction[20:16];
     
   always @(*) begin //where to write data
-  if (submit == 1'b0) begin
-      write_address = write_address;
-  end
-  else begin
-    if(RegWrite==1'b1)begin
-        if(Jal==1'b1)begin
-        write_address=5'b11111;
+    if(RegWrite == 1'b1)begin
+        if(Jal == 1'b1)begin
+            write_address=5'b11111;
         end
-        else if(RegDst==1'b1)
+        else if(RegDst == 1'b1)
         begin
-            write_address=rd;
+            write_address = rd;
         end
         else begin
-        write_address=rt;
+        write_address = rt;
         end
     end
     else begin
         write_address = write_address;
     end
   end
-  end
 
   always @(*) begin //determine what data to write
-  if (submit == 1'b0) begin
-      write_data = 32'h0000_0000;
-  end
-  else begin
-      if(MemtoReg==1'b1)begin
-      write_data=mem_data;
-      end
-    else if(Jal==1'b1)begin
-        write_data=opcplus4;
+    if(MemtoReg == 1'b1)begin
+        write_data = mem_data;
+    end
+    else if(Jal == 1'b1)begin
+        write_data = opcplus4;
     end
     else begin
-        write_data=ALU_result;//other situations, the data is from ALU
+        write_data = ALU_result;//other situations, the data is from ALU
     end
     end
-  end
   
       integer k;
 
   always @(posedge clock or posedge reset) begin
       if(reset==1'b1)begin
-          for(k=5'b00000;k<=5'b11111;k=k+5'b00001)begin
+          for(k = 5'b00000; k <= 5'b11111; k= k + 5'b00001) begin
               registers[k]=32'b0;
           end
       end
-      else begin
-      if(RegWrite==1'b1)begin
-          registers[write_address]=write_data;
+      else if(RegWrite == 1'b1) begin
+          registers[write_address] = write_data;
       end
+      else begin
+          registers[write_address] = registers[write_address];
       end
   end
     endmodule
