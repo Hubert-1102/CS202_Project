@@ -19,8 +19,11 @@ always @(negedge clock or posedge reset) begin
     end
     else begin
         if (SwitchCtrl == 1'b1 && ioRead == 1'b1) begin
-            if (switchAddr == 3'b000 || switchAddr == 3'b001) begin
+            if (switchAddr == 3'b000) begin
                 switchData <= switches[15:0];
+            end
+            else if (switchAddr == 3'b001) begin
+                switchData <= {8'h00, switches[7:0]};
             end
             else if (switchAddr == 3'b010) begin
                 switchData <= {8'h00, switches[23:16]};

@@ -16,8 +16,12 @@ always @(posedge clock or posedge reset) begin
         ledData <= 24'h000000;
     end
     else if (LEDCtrl == 1'b1 && ioWrite == 1'b1) begin
-            if (ledAddr == 2'b00 || ledAddr == 2'b01) begin
-                ledData <= {ledData[23:16], write_data[15:0]};
+            if (ledAddr == 2'b00) begin
+                // ledData <= {ledData[23:16], write_data[15:0]};
+                ledData <= {ledData[23:8], write_data[7:0]};
+            end
+            else if (ledAddr == 2'b01) begin
+                ledData <= {ledData[23:16], write_data[7:0], ledData[7:0]};
             end
             else begin
                 ledData <= {write_data[7:0], ledData[15:0]};
