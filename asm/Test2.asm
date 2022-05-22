@@ -356,8 +356,8 @@ dataset0: sw $zero,0xC62($28)
 		  
 		  	  
 # meaningless loop (about 5 seconds)
-			 lui $30,0x006d
-			 ori $30,$30,0xac2c
+			 lui $30,0x0216
+			 ori $30,$30,0x0ec0
 			 addi $t2,$zero,0 # (count variable)
 			 
 fiveSeconds: beq $t2,$30,dataset2
