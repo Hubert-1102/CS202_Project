@@ -245,7 +245,11 @@ fifth: sw $zero,0xC61($28)
 	   sll $t5,$t5,2
 	   
 	   lw $a2,0($t5)      # a2: min element
-	   lw $a3,12($t5)	  # a3: max element
+
+	   add $t5,$t5,$t6
+	   sub $t5,$t5,4
+	   
+	   lw $a3,0($t5)	  # a3: max element
 	   
 	   sub $a2,$a3,$a2    # a3 - a2
 	   
@@ -274,7 +278,11 @@ sixth: sw $zero,0xC61($28)
 	   add $t5,$t5,$t6
 	   
 	   lw $a2,0($t5)      # a2: min element
-	   lw $a3,12($t5)	  # a3: max element
+
+	   add $t5,$t5,$t6
+	   sub $t5,$t5,4
+	   
+	   lw $a3,0($t5)	  # a3: max element
 	   
 	   sub $a2,$a3,$a2    # a3 - a2
 	   
