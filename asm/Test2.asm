@@ -318,6 +318,7 @@ readIndex: lw $t8,0xC73($28)
 	       # addi $t1,$t6,0
 	       sll $t1,$t3,2
 	       addi $t7,$zero,0   # t7 is a count variable
+	       addi $t6,$zero,0
 	       
 calSetNum: beq $t7,$t4,init
 		   add $t6,$t6,$t1   # t6: the base address of the index
