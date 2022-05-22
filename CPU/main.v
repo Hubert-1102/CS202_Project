@@ -18,7 +18,10 @@ erase_shake status_shake(.clk(clock),
 
 cpuclk clk1(.clk_in1(clk), .clk_out1(clock));
 
-wire[31:0] Instruction, branch_base_addr, Addr_result, Read_data_1, opcplus4;
+wire[31:0] Instruction, Addr_result, Read_data_1;
+
+wire[31:0] branch_base_addr, jal_opcplus4;
+
 wire Branch, nBranch, Jmp, Jal, Jr, Zero;
 
 Ifetc32 ifetch(.Instruction(Instruction),
@@ -33,7 +36,7 @@ Ifetc32 ifetch(.Instruction(Instruction),
                .Zero(Zero), 
                .clock(clock),
                .reset(reset), 
-               .link_addr(opcplus4));
+               .link_addr(jal_opcplus4));
 
 wire[31:0] Read_data_2, mem_data, ALU_Result, Sign_extend;
 wire RegWrite, MemtoReg, RegDst;
@@ -50,7 +53,7 @@ decode32 decode(.read_data_1(Read_data_1),
                 .Sign_extend(Sign_extend), 
                 .clock(clock), 
                 .reset(reset), 
-                .opcplus4(opcplus4));
+                .opcplus4(jal_opcplus4));
 
 wire[5:0] Opcode;
 wire[5:0] Function_opcode;
@@ -107,7 +110,7 @@ executs32 alu(.Read_data_1(Read_data_1),
               .Zero(Zero), 
               .ALU_Result(ALU_Result), 
               .Addr_Result(Addr_result), 
-              .PC_plus_4(opcplus4));
+              .PC_plus_4(branch_base_addr));
 
 wire[15:0] readDataFromIO;
 wire LEDCtrl, SwitchCtrl;
