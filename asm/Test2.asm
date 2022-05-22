@@ -51,7 +51,7 @@ while1: addi $v1,$v1,1			# meaningless loop
 		  lw $t8,0xC73($28)
 		  bne $t8,$s1,readData
 		  addi $t1,$t1,1    # add one
-		  lw $t4,0xC71($28) # t4: the value of input data (8bit!!!)
+		  lw $t4,0xC70($28) # t4: the value of input data (8bit!!!)
 		  
 		  sw $t4,0xC60($28) # debug
 		  
@@ -298,21 +298,21 @@ seventh: sw $zero,0xC60($28)
 		 sw $zero,0xC62($28)
 		 lw $t8,0xC73($28)    # t8: data submit
 	   	 bne $t8,$s1,seventh
-	     lw $t4,0xC71($28)    # t4: which number of dataset
+	     lw $t4,0xC70($28)    # t4: which number of dataset
 	     
 	     ori $v0,$zero,	1
-		  addi $v1,$zero,0
+		 addi $v1,$zero,0
 
 while7: addi $v1,$v1,1			# meaningless loop
-	   bne $v0,$v1,while7
+	    bne $v0,$v1,while7
 		
-	   addi $v0,$zero,0
-	   addi $v1,$zero,0
+	    addi $v0,$zero,0
+	    addi $v1,$zero,0
 	     
 	     
 readIndex: lw $t8,0xC73($28)
 	       bne $t8,$s1,readIndex
-	       lw $t5,0xC71($28)  # t5: the index want to search
+	       lw $t5,0xC70($28)  # t5: the index want to search
 	       
 	       # sll $t6,$t3,2
 	       # addi $t1,$t6,0
@@ -322,6 +322,7 @@ readIndex: lw $t8,0xC73($28)
 calSetNum: beq $t7,$t4,init
 		   add $t6,$t6,$t1   # t6: the base address of the index
 		   addi $t7,$t7,1
+		   j calSetNum
 	       
 init: addi $t7,$zero,0
 calIndex: beq $t7,$t5,showData
@@ -341,7 +342,7 @@ eighth: sw $zero,0xC60($28)
 		sw $zero,0xC62($28)
 		lw $t8,0xC73($28)
 		bne $t8,$s1,eighth
-		lw $t4,0xC71($28)  # t4: the index want to search
+		lw $t4,0xC70($28)  # t4: the index want to search
 		addi $t5,$zero,0
 	    
 
@@ -354,8 +355,8 @@ dataset0: sw $zero,0xC62($28)
 		  
 		  	  
 # meaningless loop (about 5 seconds)
-			 lui $30,0x06da
-			 ori $30,$30,0xc2c0
+			 lui $30,0x006d
+			 ori $30,$30,0xac2c
 			 addi $t2,$zero,0 # (count variable)
 			 
 fiveSeconds: beq $t2,$30,dataset2

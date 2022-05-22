@@ -27,10 +27,18 @@ main: lw $t8,0xC74($28)		# t8: status submit
 	  		 
 first: lw $t9,0xC73($28)    # t9: submit
 	   bne $t9,$s1,first    # loop to read whether submit
-	   lw $t0,0xC70($28)         # load the data
+	   
+	   lw $t0,0xC70($28)         # the low 8 bits
+	   lw $t2,0xC71($28)         # the high 8 bits
+	   sll $t2,$t2,8
+	   or $t0,$t0,$t2
+	   	   	   
+	   
 	   lw $t9,0xC73($28)		 # t9: submit
 	   bne $t9,$s1,first        # loop to read whether submit
-	   sw $t0,0xC60($28)    #show the data
+	   sw $t0,0xC60($28)    # show the lower 8 bits
+	   srl $t4,$t0,8
+	   sw $t4,0xC61($28)		# show the higher 8 bits
 	   addi $t2,$t0,0
 	   addi $t3,$zero,0
 
@@ -56,12 +64,21 @@ loop2: lw $t9,0xC73($28)		# t9: submit
 	   beq $t7,$s1,read2   #41
 	   
 read1: lw $t2,0xC70($28)
-	   sw $t2,0xC60($28)
+	   lw $t4,0xC71($28)
+	   sll $t4,$t4,8
+	   or $t2,$t2,$t4
+	   sw $t2,0xC60($28)    # show the low 8 bits
+	   srl $t4,$t2,8
+	   sw $t4,0xC61($28)		# show the high 8 bits
 	   addi $t7,$t7,1
 	   j second
 
 read2: lw $t3,0xC70($28)
+	   lw $t4,0xC71($28)
+	   sll $t4,$t4,8
 	   sw $t3,0xC60($28)
+	   srl $t4,$t3,8
+	   sw $t4,0xC61($28)
 	   addi $t7,$t7,1
 	   j second
 
@@ -69,31 +86,43 @@ read2: lw $t3,0xC70($28)
 third: sw $zero,0xC62($28)
 	   and $t4,$t2,$t3      # a & b
 	   sw $t4,0xC60($28)
+	   srl $t4,$t4,8
+	   sw $t4,0xC61($28)
 	   j Exit
 	   
 fourth: sw $zero,0xC62($28)
 		or $t4,$t2,$t3
 		sw $t4,0xC60($28)
+		srl $t4,$t4,8
+	    sw $t4,0xC61($28)
 		j Exit
 		
 fifth: sw $zero,0xC62($28)
 	   xor $t4,$t2,$t3
 	   sw $t4,0xC60($28)
+	   srl $t4,$t4,8
+	   sw $t4,0xC61($28)
 	   j Exit
 	   
 sixth: sw $zero,0xC62($28)
 	   sllv $t2,$t2,$t3   # t2 : a t3 : b
 	   sw $t2,0xC60($28)
+	   srl $t4,$t2,8
+	   sw $t4,0xC61($28)
 	   j Exit
 	   
 seventh: sw $zero,0xC62($28)
 		 srlv $t2,$t2,$t3
 		 sw $t2,0xC60($28)
+		 srl $t4,$t2,8
+	     sw $t4,0xC61($28)
 		 j Exit
 		 
 eighth: sw $zero,0xC62($28)
 		srav $t2,$t2,$t3
 		sw $t2,0xC60($28)
+		srl $t4,$t2,8
+	    sw $t4,0xC61($28)
 		j Exit
 	   
 Exit: 
