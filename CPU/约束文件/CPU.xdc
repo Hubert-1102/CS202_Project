@@ -2,6 +2,10 @@ set_property IOSTANDARD LVCMOS33 [get_ports clk]
 set_property IOSTANDARD LVCMOS33 [get_ports reset]
 set_property IOSTANDARD LVCMOS33 [get_ports submit]
 set_property IOSTANDARD LVCMOS33 [get_ports status]
+set_property IOSTANDARD LVCMOS33 [get_ports start_pg]
+set_property IOSTANDARD LVCMOS33 [get_ports uart_in]
+set_property IOSTANDARD LVCMOS33 [get_ports uart_out]
+
 
 set_property IOSTANDARD LVCMOS33 [get_ports switches[23]]
 set_property IOSTANDARD LVCMOS33 [get_ports switches[22]]
@@ -108,3 +112,7 @@ set_property PACKAGE_PIN E21 [get_ports leds[3]]
 set_property PACKAGE_PIN D22 [get_ports leds[2]]
 set_property PACKAGE_PIN E22 [get_ports leds[1]]
 set_property PACKAGE_PIN A21 [get_ports leds[0]]
+set_property PACKAGE_PIN P2 [get_ports start_pg]
+set_property PACKAGE_PIN Y19 [get_ports uart_in]
+set_property PACKAGE_PIN V18 [get_ports uart_out]
+
