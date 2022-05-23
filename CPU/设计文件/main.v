@@ -1,10 +1,35 @@
 `timescale 1ns / 1ps
 
-module main(clk, reset, leds, switches, submit, status);
+module main(start_pg,uart_in,uart_out,clk, reset, leds, switches, submit, status);
 
-input clk, reset, submit, status;
+input clk, reset, submit, status,start_pg,uart_in;
+output uart_out;
 wire clock;
 wire submit_posedge, status_posedge;
+
+wire upg_clk,upg_clk_o,upg_wen_o;
+wire upg_done_o;
+wire [14:0] upg_adr_o;
+wire [31:0] upg_dat_o;
+wire spg_bufg;
+BUFG U1(.I(start_pg),.O(spg_bufg));
+reg upg_rst;
+
+always@(posedge clk)begin
+        if(spg_bufg)upg_rst=0;
+        if(reset)upg_rst=1;
+end
+wire rst;
+assign rst=reset|!upg_rst;
+
+
+
+uart u(.upg_clk_i(upg_clk),.upg_rst_i(upg_rst),
+.upg_rx_i(uart_in),.upg_clk_o(upg_clk_o),
+.upg_wen_o(upg_wen_o),.upg_adr_o(upg_adr_o),
+.upg_dat_o(upg_dat_o),.upg_done_o(upg_done_o),
+.upg_tx_o(uart_out)
+);
 
 erase_shake submit_shake(.clk(clock),
                         .rst(reset),
@@ -16,15 +41,31 @@ erase_shake status_shake(.clk(clock),
                         .key_in(status),
                         .key_out(status_posedge));
 
-cpuclk clk1(.clk_in1(clk), .clk_out1(clock));
+cpuclk clk1(.clk_in1(clk), .clk_out1(clock),.clk_out2(upg_clk));
 
-wire[31:0] Instruction, Addr_result, Read_data_1;
+wire[31:0] Instruction,  Addr_result, Read_data_1;
 
 wire[31:0] branch_base_addr, jal_opcplus4;
 
 wire Branch, nBranch, Jmp, Jal, Jr, Zero;
 
+wire[31:0] Instruction_i;
+wire [13:0] addr_o;
+programrom p(
+        .clk_i(clock),
+        .adr_i(addr_o),
+        .upg_rst_i(upg_rst),
+        .upg_clk_i(upg_clk_o),
+        .upg_wen_i((!upg_adr_o[14])&upg_wen_o),
+        .upg_adr_i(upg_adr_o[13:0]),
+        .upg_dat_i(upg_dat_o),
+        .upg_done_i(upg_done_o),
+        .Instruction_o(Instruction_i)
+);
+
 Ifetc32 ifetch(.Instruction(Instruction),
+                .Instruction_i(Instruction_i),
+                .addr_o(addr_o),
                .branch_base_addr(branch_base_addr),
                .Addr_result(Addr_result), 
                .Read_data_1(Read_data_1), 
@@ -35,7 +76,7 @@ Ifetc32 ifetch(.Instruction(Instruction),
                .Jr(Jr), 
                .Zero(Zero), 
                .clock(clock),
-               .reset(reset), 
+               .reset(rst), 
                .link_addr(jal_opcplus4));
 
 wire[31:0] Read_data_2, mem_data, ALU_Result, Sign_extend;
@@ -52,7 +93,7 @@ decode32 decode(.read_data_1(Read_data_1),
                 .RegDst(RegDst), 
                 .Sign_extend(Sign_extend), 
                 .clock(clock), 
-                .reset(reset), 
+                .reset(rst), 
                 .opcplus4(jal_opcplus4));
 
 wire[5:0] Opcode;
@@ -91,7 +132,14 @@ dmemory32 memory(.clock(clock),
                  .memWrite(MemWrite), 
                  .address(memoryAddress), 
                  .writeData(writeData), 
-                 .readData(readDataFromMemory));
+                 .readData(readDataFromMemory),
+                .upg_rst_i(upg_rst),
+                 .upg_clk_i(upg_clk_o),
+                 .upg_wen_i(upg_adr_o[14]&upg_wen_o),
+                 .upg_adr_i(upg_adr_o[13:0]),
+                 .upg_dat_i(upg_dat_o),
+                 .upg_done_i(upg_done_o)
+                 );
 
 wire[4:0] Shamt;
 assign Shamt = Instruction[10:6];
@@ -138,7 +186,7 @@ assign lowTwoBitAddr = memoryAddress[1:0];
 assign lowThreeBitAddr = memoryAddress[2:0];
 
 led led(.clock(clock),
-        .reset(reset),
+        .reset(rst),
         .LEDCtrl(LEDCtrl),
         .ioWrite(IOWrite),
         .write_data(writeData[15:0]),
@@ -149,7 +197,7 @@ input[23:0] switches;
 
 // Read data from IO
 switch switch(.clock(clock),
-              .reset(reset),
+              .reset(rst),
               .SwitchCtrl(SwitchCtrl),
               .ioRead(IORead),
               .switches(switches),

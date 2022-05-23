@@ -79,7 +79,7 @@ module decode32(read_data_1,read_data_2,Instruction,mem_data,ALU_result,
               registers[k]=32'b0;
           end
       end
-      else if(RegWrite == 1'b1) begin
+      else if(RegWrite == 1'b1 && write_address > 0) begin
           registers[write_address] = write_data;
       end
       else begin

@@ -1,7 +1,9 @@
 `timescale 1ns / 1ps
 
-module Ifetc32(Instruction,branch_base_addr,Addr_result,Read_data_1,Branch,nBranch,Jmp,Jal,Jr,Zero,clock,reset,link_addr);
-    output[31:0] Instruction;			// 根据PC的值从存放指令的prgrom中取出的指令
+module Ifetc32(Instruction,Instruction_i,addr_o,branch_base_addr,Addr_result,Read_data_1,Branch,nBranch,Jmp,Jal,Jr,Zero,clock,reset,link_addr);
+    output[31:0] Instruction;
+    output [13:0]addr_o;
+    input[31:0] Instruction_i;				// 根据PC的值从存放指令的prgrom中取出的指令
     output[31:0] branch_base_addr;      // 对于有条件跳转类的指令而言，该值为(pc+4)送往ALU
     input[31:0]  Addr_result;            // 来自ALU,为ALU计算出的跳转地址
     input[31:0]  Read_data_1;           // 来自Decoder，jr指令用的地址
@@ -16,9 +18,9 @@ module Ifetc32(Instruction,branch_base_addr,Addr_result,Read_data_1,Branch,nBran
 
     reg[31:0] PC, Next_PC;
     reg[31:0] Jal_address;
-
-    prgrom instmem(.clka(clock), .addra(PC[15:2]), .douta(Instruction));
-
+    assign addr_o=PC[15:2];
+    // prgrom instmem(.clka(clock), .addra(PC[15:2]), .douta(Instruction));
+    assign Instruction=Instruction_i;
     assign branch_base_addr = PC + 3'b100;
     assign link_addr = Jal_address;
     // assign link_addr = PC + 3'b100;
