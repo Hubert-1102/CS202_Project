@@ -81,7 +81,7 @@ module executs32(Read_data_1,Read_data_2,Sign_extend,Function_opcode,Exe_opcode,
         // slt, slti, sltu, sltiu
         if ((ALU_ctl == 3'b111 && Exe_code[3] == 1) || (ALU_ctl[2:1] == 2'b11 && I_format == 1'b1)) begin
             // ALU_FinalResult = (Ainput - Binput < 0) ? 1 : 0;
-            ALU_FinalResult = $signed(Ainput) < $signed(Binput);
+            ALU_FinalResult = Exe_code[0] == 1 ? Ainput < Binput : $signed(Ainput) < $signed(Binput);
         end
         // lui
         else if (ALU_ctl == 3'b101 && I_format == 1'b1) begin
