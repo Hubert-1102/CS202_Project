@@ -110,12 +110,12 @@ innerLoopExit2: addi $t6,$t6,1    # i++
 			    j foroutloop2
 			    
 
-debug2: lw $26,16($zero)
-		sw $26,0xC62($28)
-		lw $26,20($zero)
-		sw $26,0xC61($28)
-		lw $26,24($zero)
-		sw $26,0xC60($28)
+debug2: #lw $26,16($zero)
+		#sw $26,0xC62($28)
+		#lw $26,20($zero)
+		#sw $26,0xC61($28)
+		#lw $26,24($zero)
+		#sw $26,0xC60($28)
 		j Exit
 			 
 			 
@@ -159,12 +159,12 @@ negative: xori $v0,$v0,0x00ff
 		  j forloop3rd
 		  
 		  
-debug3: lw $26,32($zero)
-		sw $26,0xC62($28)
-		lw $26,36($zero)
-		sw $26,0xC61($28)
-		lw $26,40($zero)
-		sw $26,0xC60($28)
+debug3: #lw $26,32($zero)
+		#sw $26,0xC62($28)
+		#lw $26,36($zero)
+		#sw $26,0xC61($28)
+		#lw $26,40($zero)
+		#sw $26,0xC60($28)
 		j Exit
 			 
 			 
@@ -230,12 +230,12 @@ innerLoopExit4: addi $t6,$t6,1    # i++
 			    j foroutloop4
 			    
 
-debug4: lw $26,48($zero)
-		sw $26,0xC62($28)
-		lw $26,52($zero)
-		sw $26,0xC61($28)
-		lw $26,56($zero)
-		sw $26,0xC60($28)
+debug4: #lw $26,48($zero)
+		#sw $26,0xC62($28)
+		#lw $26,52($zero)
+		#sw $26,0xC61($28)
+		#lw $26,56($zero)
+		#sw $26,0xC60($28)
 		j Exit	
 
 
