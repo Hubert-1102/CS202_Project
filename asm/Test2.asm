@@ -242,6 +242,7 @@ debug4: lw $26,48($zero)
 fifth: sw $zero,0xC61($28)
 	   sw $zero,0xC62($28)
 	   addi $t5,$t3,0     # t3: n,  t5: the first address of the array
+	   sll $t6,$t5,2
 	   sll $t5,$t5,2
 	   
 	   lw $a2,0($t5)      # a2: min element
